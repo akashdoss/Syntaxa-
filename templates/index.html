@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntaxia - Your Smart Coding Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <style>
+        :root {
+            --bg-color: #1a1b26;
+            --card-color: #24283b;
+            --text-color: #c0caf5;
+            --heading-color: #ffffff;
+            --accent-color: #7aa2f7;
+            --accent-hover: #9eceff;
+            --border-color: #414868;
+            --error-color: #f7768e;
+            --success-color: #9ece6a;
+            --code-bg: #1e1e2e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Center vertically for welcome */
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            overflow-y: auto; /* Allow vertical scrolling */
+        }
+
+        #background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .logo-icon {
+            position: absolute;
+            bottom: -150px;
+            display: block;
+            color: var(--border-color);
+            opacity: 0;
+            animation: float-up 20s linear infinite;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+            10%, 90% {
+                 opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            z-index: 1;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--heading-color);
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+        
+        /* Welcome Page Styles */
+        #welcome-container {
+            align-items: center;
+            text-align: center;
+            background: rgba(36, 40, 59, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(65, 72, 104, 0.6);
+        }
+        
+        #welcome-container .animated-gradient-text {
+             font-size: 3.5rem;
+             margin-bottom: 0.5rem;
+             font-weight: 700;
+             background: linear-gradient(90deg, #c0caf5, #7aa2f7, #9eceff, #c0caf5);
+             background-size: 200% auto;
+             -webkit-background-clip: text;
+             background-clip: text;
+             color: transparent;
+             animation: gradient-flow 4s linear infinite;
+        }
+        
+        @keyframes gradient-flow {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        #welcome-container p {
+            font-size: 1.2rem;
+            max-width: 500px;
+            margin-bottom: 2rem;
+        }
+        
+        #welcome-container .get-started-btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, var(--accent-color), var(--accent-hover));
+            box-shadow: 0 4px 20px rgba(122, 162, 247, 0.25);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        #welcome-container .get-started-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(122, 162, 247, 0.4);
+        }
+        
+        footer {
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+        
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        footer a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        h2 {
+            color: var(--heading-color);
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        label {
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(122, 162, 247, 0.3);
+        }
+        
+        textarea {
+            min-height: 250px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex-grow: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent-color);
+            color: #15161e;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        #api-submit-btn {
+            background-color: var(--success-color);
+        }
+
+        .output-container {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: var(--bg-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            min-height: 100px;
+            position: relative;
+        }
+
+        #output h1, #output h2, #output h3, #output h4, #output h5, #output h6 {
+    color: var(--heading-color);
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+        
+        /* Improved spacing for output elements */
+        #output h1, #output h2, #output h3, #output h4, #output h5, #output h6 {
+            color: var(--heading-color);
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+        }
+
+        #output h1:first-child, #output h2:first-child, #output h3:first-child,
+        #output h4:first-child, #output h5:first-child, #output h6:first-child {
+            margin-top: 0;
+        }
+
+        #output p {
+            margin-bottom: 1em;
+        }
+
+        #output p:last-child {
+            margin-bottom: 0;
+        }
+        
+        #output strong {
+            color: var(--error-color);
+            font-weight: 600;
+        }
+
+        #output pre {
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            padding: 1em;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            margin: 1em 0;
+        }
+
+        #output pre:first-child {
+            margin-top: 0;
+        }
+
+        #output pre:last-child {
+            margin-bottom: 0;
+        }
+
+        #output code {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        #output ol, #output ul {
+            padding-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        #output ol:last-child, #output ul:last-child {
+            margin-bottom: 0;
+        }
+
+        #output li {
+            margin-bottom: 0.25em;
+        }
+
+        #output blockquote {
+            border-left: 3px solid var(--accent-color);
+            padding-left: 1em;
+            margin: 1em 0;
+            font-style: italic;
+        }
+        
+        #apiError {
+            color: var(--error-color);
+            text-align: center;
+            min-height: 1.2em;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background-animation"></div>
+
+    <div id="welcome-container" class="container card">
+        <h1 class="animated-gradient-text">Syntaxia</h1>
+        <p>Your smart coding assistant. Explain complex code, debug errors, and improve your projects with the power of AI.</p>
+        <button class="get-started-btn" id="get-started-btn">Get Started</button>
+        <footer>
+            <p>Created by <a href="https://www.linkedin.com/in/akash-selvadoss-n-542765252/" target="_blank" rel="noopener noreferrer">Akash Doss</a></p>
+        </footer>
+    </div>
+    
+    <div id="app-container" class="container hidden">
+        <header class="header">
+            <h1>Syntaxia</h1>
+        </header>
+
+        <!-- API Key Input -->
+        <div class="card" id="api-container">
+            <h2>Enter Your Gemini API Key</h2>
+            <div class="input-group">
+                <label for="apiKeyInput">API Key</label>
+                <input type="password" id="apiKeyInput" placeholder="Paste your API Key here" />
+            </div>
+            <button id="api-submit-btn" onclick="submitApiKey()">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                 Save & Continue
+            </button>
+            <p id="apiError"></p>
+        </div>
+
+        <!-- Code Analysis Area -->
+        <div class="card hidden" id="code-container">
+            <div class="input-group">
+                <label for="codeInput">Your Code</label>
+                <textarea id="codeInput" placeholder="Paste your code here..."></textarea>
+            </div>
+            <div class="button-group">
+                <button onclick="analyze('explain')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    Explain Code
+                </button>
+                <button onclick="analyze('fix')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    Find & Fix Bugs
+                </button>
+            </div>
+            <div class="output-container">
+                <div class="loader hidden" id="loader"></div>
+                <div id="output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const welcomeContainer = document.getElementById('welcome-container');
+            const appContainer = document.getElementById('app-container');
+            const apiContainer = document.getElementById('api-container');
+            const codeContainer = document.getElementById('code-container');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const apiError = document.getElementById('apiError');
+            const codeInput = document.getElementById('codeInput');
+            const output = document.getElementById('output');
+            const loader = document.getElementById('loader');
+            const getStartedBtn = document.getElementById('get-started-btn');
+
+            // --- Background Animation ---
+            function createBackgroundLogos() {
+                const animationContainer = document.getElementById('background-animation');
+                const logos = ['py', 'java', 'js', '{}', '/>', 'css', '#', 'c++'];
+                const numLogos = 25;
+
+                for (let i = 0; i < numLogos; i++) {
+                    const logo = document.createElement('span');
+                    logo.classList.add('logo-icon');
+                    logo.innerText = logos[Math.floor(Math.random() * logos.length)];
+                    logo.style.left = `${Math.random() * 100}vw`;
+                    logo.style.fontSize = `${Math.random() * 20 + 10}px`;
+                    logo.style.animationDuration = `${Math.random() * 10 + 20}s`;
+                    logo.style.animationDelay = `${Math.random() * 15}s`;
+                    animationContainer.appendChild(logo);
+                }
+            }
+            createBackgroundLogos();
+
+            // --- Page Transitions ---
+            getStartedBtn.addEventListener('click', () => {
+                welcomeContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                document.body.style.alignItems = 'flex-start'; // Align to top for app view
+            });
+            
+            // --- API and Analysis Logic ---
+            window.submitApiKey = async function() {
+                const apiKey = apiKeyInput.value.trim();
+                if (!apiKey) {
+                    apiError.innerText = 'Please enter an API Key.';
+                    return;
+                }
+                apiError.innerText = 'Validating key...';
+
+                try {
+                    const res = await fetch('/set_api_key', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ api_key: apiKey })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        apiContainer.classList.add('hidden');
+                        codeContainer.classList.remove('hidden');
+                    } else {
+                        apiError.innerText = `Error: ${data.error}`;
+                    }
+                } catch (error) {
+                     apiError.innerText = 'An unexpected error occurred. Please check the console.';
+                     console.error("API Key Submission Error:", error);
+                }
+            }
+
+            window.analyze = async function(task) {
+                const code = codeInput.value.trim();
+                if (!code) {
+                    output.innerHTML = '<p>Please paste some code to analyze.</p>';
+                    return;
+                }
+
+                output.innerHTML = '';
+                loader.classList.remove('hidden');
+
+                try {
+                    const res = await fetch('/analyze_code', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code, task })
+                    });
+                    
+                    loader.classList.add('hidden');
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        output.innerHTML = marked.parse(data.reply);
+                        output.querySelectorAll('pre code').forEach((block) => {
+                           hljs.highlightElement(block);
+                        });
+                    } else {
+                        output.innerHTML = `<p style="color: var(--error-color);">Error: ${data.error || 'An unknown error occurred.'}</p>`;
+                    }
+                } catch (error) {
+                    loader.classList.add('hidden');
+                    output.innerHTML = '<p style="color: var(--error-color);">An unexpected error occurred. Please check the console.</p>';
+                    console.error("Analysis Error:", error);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
